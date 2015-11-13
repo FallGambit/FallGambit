@@ -29,7 +29,10 @@ GEM
     autoprefixer-rails (6.1.0.1)
       execjs
       json
+<<<<<<< HEAD
+=======
     bcrypt (3.1.10)
+>>>>>>> 19e2353aa981dda011d4b013704a3e4c4f6ba1b2
     bootstrap-sass (3.3.5)
       autoprefixer-rails (>= 5.0.0.1)
       sass (>= 3.2.19)
