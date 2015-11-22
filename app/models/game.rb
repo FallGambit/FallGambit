@@ -1,7 +1,12 @@
 class Game < ActiveRecord::Base
-  has_many :pieces, dependent: :destroy
-  validates :game_name, :presence => { :message => "Game name is required!" }
-  after_create :populate_board!
+
+	has_many :pieces, dependent: :destroy
+	has_many :users, :through => :pieces
+	validates :game_name, :presence => { :message => "Game name is required!" }
+	after_create :populate_board!
+
+	# This is part of STI ~AMP:
+	delegate :pawns, :queens, :kings, :knights, :rooks, :bishops, to: :pieces
 
   def populate_board!
     # Creates all 32 chess pieces with their initial X/Y coordinates.
@@ -97,4 +102,5 @@ class Game < ActiveRecord::Base
                  piece_type: "Rook", color: is_white,
                  user_id: curr_user, captured: false)
   end
+
 end
