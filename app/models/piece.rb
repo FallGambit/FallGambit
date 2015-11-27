@@ -24,11 +24,6 @@ class Piece < ActiveRecord::Base
   end
 
   def is_obstructed?
-    # test for pieces adjacent to current position
-    # Horizontal obstructions
-    # Vertical obstructions
-    # Diagonal Obstructions
-    # Invalid input (none of the above) - doesn't makes
-    # sense: raise an error message
+    false
   end
 end
