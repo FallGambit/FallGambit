@@ -11,8 +11,8 @@ class Piece < ActiveRecord::Base
                          allow_nil: true
   after_initialize :set_image
 
-  # Lines 7-17 all part of STI: to break it disable line 6 or give it
-  # fake field name ~AMP
+  # Lines 16-22 all part of STI: to break it disable line 6 or give
+  # self.inheritance_column a fake field name ~AMP
   self.inheritance_column = :piece_type
   scope :pawns, -> { where(piece_type: "Pawn") }
   scope :queens, -> { where(piece_type: "Queen") }
@@ -55,11 +55,16 @@ class Piece < ActiveRecord::Base
                               :y_position => nil)
   end
 
+  def find_piece(x, y)
+    game.pieces.where("x_position = ? AND y_position = ?", x, y)
+  end
+
   def square_occupied?(x, y)
-    game.pieces.where("x_position = ? AND y_position = ?", x, y).any?
+    find_piece(x, y).any?
   end
 
   def range_occupied?(x1, x2, y1, y2)
+    # Use Restriction: x1 < x2, y1 < y2
     game.pieces.where("x_position BETWEEN ? AND ? AND y_position BETWEEN ? AND ?", x1, x2, y1, y2).any?
   end
 
