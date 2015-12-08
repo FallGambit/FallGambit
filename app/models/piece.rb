@@ -65,7 +65,9 @@ class Piece < ActiveRecord::Base
 
   def range_occupied?(x1, x2, y1, y2)
     # Use Restriction: x1 < x2, y1 < y2
-    game.pieces.where("x_position BETWEEN ? AND ? AND y_position BETWEEN ? AND ?", x1, x2, y1, y2).any?
+    game.pieces
+      .where("x_position BETWEEN ? AND ? AND y_position BETWEEN ? AND ?",
+             x1, x2, y1, y2).any?
   end
 
   def is_obstructed?(dest_x, dest_y)
