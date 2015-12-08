@@ -1,0 +1,20 @@
+<% if current_game %>
+<br />
+<br />
+<div class="row">
+  <div class="col-md-6 col-md-offset-3 text-center">
+    <h3><%= current_game.game_name %></h3>
+    <br />
+    <br />
+  </div>
+</div>
+<table class="chessboard">
+  <% (0..7).to_a.each do |row| %>
+    <tr class="y-position-<%= row %>" >
+      <% (0..7).each do |column| %>
+        <%= show_piece_td(row, column).html_safe %>
+      <% end %>
+    </tr>
+  <% end %>
+</table>
+<% end %>
