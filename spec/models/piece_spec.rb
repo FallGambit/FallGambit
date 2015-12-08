@@ -274,7 +274,7 @@ RSpec.describe Piece, type: :model do
       # also tests single space movement graceful handling in diagonal
       expect(@white_queen.is_obstructed?(1, 1)).to eq false
     end
-    
+
     after :all do
       @game.pieces.delete_all
       @game.delete
