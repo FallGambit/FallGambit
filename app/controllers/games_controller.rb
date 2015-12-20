@@ -1,5 +1,5 @@
 class GamesController < ApplicationController
-  before_action :authenticate_user!, only: [:create, :update]
+  before_action :authenticate_user!, only: [:create, :update, :move]
 
   def new
     @game = Game.new
@@ -33,6 +33,13 @@ class GamesController < ApplicationController
     handle_update_errors
   end
 
+  def move
+    respond_to do |format|
+      format.json { redirect_to piece_path(params[:piece_id]) }
+      format.html { redirect_to game_path(current_game) }
+    end
+  end
+
   private
 
   helper_method :current_game, :place_piece_td
@@ -48,10 +55,12 @@ class GamesController < ApplicationController
 
   def place_piece_td(row, column)
     find_piece = board_display_piece_query(row, column)
-    board_square = "<td class='x-position-'#{column}' "
-    board_square += "piece-id-data='#{piece_id(find_piece)}' "
-    board_square += "piece-type-data='#{piece_type(find_piece)}''>"
-    unless find_piece.nil?
+    board_square = "<td data-x-position='#{column}'"
+    if find_piece.nil?
+      board_square += ">"
+    else
+      board_square += " data-piece-id='#{piece_id(find_piece)}' "
+      board_square += "data-piece-type='#{piece_type(find_piece)}'>"
       image = ActionController::Base.helpers.image_tag find_piece
               .image_name, size: '40x45',
                            class: 'img-responsive center-block'

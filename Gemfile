@@ -39,6 +39,9 @@ gem 'devise'
 # Implement foreign keys
 gem 'foreigner'
 
+# JQuery UI for drag and drop features
+gem 'jquery-ui-rails'
+
 group :doc do
   # bundle exec rake doc:rails generates the API under doc/api.
   gem 'sdoc', require: false

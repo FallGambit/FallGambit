@@ -10,7 +10,7 @@
 </div>
 <table class="chessboard">
   <% (0..7).to_a.reverse.each do |row| %>
-    <tr class="y-position-<%= row %>" >
+    <tr data-y-position="<%= row %>">
       <% (0..7).each do |column| %>
         <%= show_piece_td(row, column).html_safe %>
       <% end %>

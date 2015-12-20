@@ -1,6 +1,7 @@
 FallGambit::Application.routes.draw do
   
   devise_for :users
+  put "games/:id/move", to: "games#move"
   resources :games, :only => [:new, :create, :show, :update]
   resources :pieces, :only => [:show, :update]
 

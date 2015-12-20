@@ -1,3 +1,41 @@
+<script type="text/javascript">
+$(document).ready(function () {
+  $("[data-piece-id]").children("[href]").children('img').draggable({
+    containment: ".chessboard",
+    create: function(){$(this).data('position',$(this).position())},
+    cursorAt:{left:15},
+    cursor:'move',
+    start: function( event, ui ) {
+      $(this).stop(true,true);
+    }
+  });
+
+  function snapToMiddle(dragger, target){
+      var topMove = target.position().top - dragger.data('position').top + (target.outerHeight(true) - dragger.outerHeight(true)) / 2;
+      var leftMove= target.position().left - dragger.data('position').left + (target.outerWidth(true) - dragger.outerWidth(true)) / 2;
+      dragger.animate({top:topMove,left:leftMove},{duration:600,easing:'easeOutBack'});
+  }
+  
+  $("td").droppable({
+      drop: function(event, ui) {
+        snapToMiddle(ui.draggable,$(this));
+        var x_pos = $(this).data('x-position');
+        var y_pos = $(this).parent().data('y-position');
+        var current_piece_id = ui.draggable.parent().parent().data('piece-id');
+        $.ajax({
+            url: "<%=current_game.id%>/move",
+            type: 'PUT',
+            dataType: 'json',
+            data: { piece_id: current_piece_id, x: x_pos, y: y_pos}
+        })
+        .done (function() {
+          location.reload(true); //refreshes page from server after move
+      });
+      }
+  });
+});
+</script>
+
 <% if current_game %>
 <br />
 <br />
@@ -10,7 +48,7 @@
 </div>
 <table class="chessboard">
   <% (0..7).to_a.reverse.each do |row| %>
-    <tr class="y-position-<%= row %>" >
+    <tr data-y-position="<%= row %>">
       <% (0..7).each do |column| %>
         <%= place_piece_td(row, column).html_safe %>
       <% end %>
