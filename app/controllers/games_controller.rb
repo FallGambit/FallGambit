@@ -23,7 +23,7 @@ class GamesController < ApplicationController
 
   def update
     @game = Game.find(params[:id])
-    if @game.white_user_id.nil? || @game.black_user_id.nil?
+    if @game.player_missing?
       update_player
       if @game.errors.empty?
         redirect_to game_path(@game)
@@ -73,19 +73,19 @@ class GamesController < ApplicationController
     if params[:game][:creator_plays_as_black] == '1'
       { black_user_id: current_user.id }
     else
-      { white_user_id: current_user.id }
+      { white_user_id: current_user.id, user_turn: current_user.id }
     end
   end
 
   def game_create_params
     params.require(:game).permit(:game_name, :creator_plays_as_black,
-                                 :white_user_id, :black_user_id)
+                                 :white_user_id, :black_user_id, :user_turn)
       .merge(merge_player_color_choice_param)
   end
 
   def update_player
     if @game.white_user_id.nil?
-      @game.update_attributes(white_user_id: current_user.id)
+      @game.update_attributes(white_user_id: current_user.id, user_turn: current_user.id)
       @game.set_pieces_white_user_id
     else
       @game.update_attributes(black_user_id: current_user.id)

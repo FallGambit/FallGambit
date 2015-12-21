@@ -46,12 +46,15 @@ RSpec.describe GamesController, type: :controller do
             expect(response).to redirect_to(Game.last)
           end
           it 'sets all white pieces to be owned by white player' do
-            post :create, game: { game_name: "Test White",
-                                  white_user_id: subject.current_user.id }
+            post :create, game: { game_name: "Test White", creator_plays_as_black: "0" }
             expect(Game.last.pieces.where(user_id: subject.current_user.id)
               .count).to eq 16
             expect(Game.last.pieces.where(user_id: nil)
               .count).to eq 16
+          end
+          it "sets the current user's turn if they are the white player" do
+            post :create, game: { game_name: "Test White", creator_plays_as_black: "0" }
+            expect(Game.last.user_turn).to eq(subject.current_user.id)
           end
         end
         context 'with black player creating the game' do
@@ -68,12 +71,22 @@ RSpec.describe GamesController, type: :controller do
             expect(Game.last.pieces.where(user_id: nil)
               .count).to eq 16
           end
+          it "does not set the user's turn if they are black player" do
+            post :create, game: { game_name: "Test Black",
+                                  creator_plays_as_black: "1" }
+            expect(Game.last.user_turn).to be_nil
+          end
         end
       end
       context 'with invalid params' do
-        it 're-renders #new form' do
+        it 're-renders #new form with bad game name' do
           post :create, game: { game_name: "" }
           expect(response).to render_template(:new)
+        end
+        it 'raises error with bad user turn id value' do
+          expect{post :create, game: { game_name: "Test Black",
+                                creator_plays_as_black: "1", user_turn: (User.count+1) }}
+                                .to raise_error(ActiveRecord::InvalidForeignKey)
         end
       end
     end
@@ -89,48 +102,62 @@ RSpec.describe GamesController, type: :controller do
     context 'with logged in user' do
       login_user
       context 'with white player joining game' do
-        let(:black_player) { create(:user) }
-        let(:game_to_update) do
-          Game.create(game_name: "Test",
-                      black_user_id: black_player.id)
+        before :each do
+          @game_to_update = build(:game)
+          @game_to_update.assign_attributes(user_turn: subject.current_user.id, white_user_id: nil)
+          @game_to_update.save!
         end
         it 'redirects to show page' do
-          put :update, id: game_to_update.id, game: {
-            white_user_id: subject.current_user.id }
-          expect(response).to redirect_to(game_to_update)
+          put :update, id: @game_to_update.id, game: { white_user_id: subject.current_user.id }
+          expect(response).to redirect_to(@game_to_update)
         end
         it 'sets all white pieces to be owned by white player' do
-          put :update, id: game_to_update.id, game: {
-            white_user_id: subject.current_user.id }
-          expect(game_to_update.pieces.where(user_id: subject.current_user.id)
-            .count).to eq 16
+          expect(@game_to_update.pieces.where(user_id: subject.current_user.id)
+            .count).to eq 0
+          put :update, id: @game_to_update.id, game: { white_user_id: subject.current_user.id }
+          expect(@game_to_update.pieces.where(user_id: subject.current_user.id)
+              .count).to eq 16
+        end
+        it "sets the current user's turn" do
+          @game_to_update.assign_attributes(user_turn: nil) 
+          @game_to_update.save(validate: false) #don't validate, it won't pass
+          expect(@game_to_update.user_turn).to be_nil
+          put :update, id: @game_to_update.id, game: { white_user_id: subject.current_user.id }
+          expect(@game_to_update.user_turn).to eq @game_to_update.white_user_id
         end
       end
       context 'with black player joining game' do
-        let(:white_player) { create(:user) }
-        let(:game_to_update) do
-          Game.create(game_name: "Test",
-                      white_user_id: white_player.id)
+        before :each do
+          @game_to_update = build(:game)
+          @game_to_update.assign_attributes(user_turn: @game_to_update.white_user_id, black_user_id: nil)
+          @game_to_update.save!
         end
         it 'redirects to show page' do
-          put :update, id: game_to_update.id, game: {
+          put :update, id: @game_to_update.id, game: {
             black_user_id: subject.current_user.id }
-          expect(response).to redirect_to(game_to_update)
-        end
+            expect(response).to redirect_to(@game_to_update)
+          end
         it 'sets all black pieces to be owned by black player' do
-          put :update, id: game_to_update.id, game: {
-            white_user_id: subject.current_user.id }
-          expect(game_to_update.pieces.where(user_id: subject.current_user.id)
-            .count).to eq 16
+          expect(@game_to_update.pieces.where(user_id: subject.current_user.id)
+            .count).to eq 0
+          put :update, id: @game_to_update.id, game: {
+            black_user_id: subject.current_user.id }
+            expect(@game_to_update.pieces.where(user_id: subject.current_user.id)
+              .count).to eq 16
+        end
+        it "does not set the current user's turn" do
+          put :update, id: @game_to_update.id, game: {
+            black_user_id: subject.current_user.id }
+            expect(@game_to_update.user_turn).to eq @game_to_update.white_user_id
         end
       end
       it 'won\'t let player join full game' do
         game = create(:game)
         put :update, id: game.id, game: {
           white_user_id: subject.current_user.id }
-        expect(response).to redirect_to(root_path)
-        expect(flash[:alert]).to be_present
-        expect(flash[:alert]).to eq('Game is full!')
+          expect(response).to redirect_to(root_path)
+          expect(flash[:alert]).to be_present
+          expect(flash[:alert]).to eq('Game is full!')
       end
     end
     context 'without being logged in' do

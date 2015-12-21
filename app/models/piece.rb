@@ -40,13 +40,20 @@ class Piece < ActiveRecord::Base
 
   def move_to!(x, y)
     @target = game.pieces.where(:x_position => x, :y_position => y).take
-    fail "Invalid move: [error to be defined]" unless valid_move?(x, y)
+    unless valid_move?(x, y)
+      self.flash_message = "Invalid move: [error to be defined]"
+      return false
+    end
     if @target.nil?
       update_attributes(:x_position => x, :y_position => y, :has_moved => true)
     else
-      fail "Invalid move: same color piece" if color == @target.color
+      if color == @target.color
+        self.flash_message =  "Invalid move: same color piece"
+        return false
+      end
       capture(x, y)
     end
+    return true
   end
 
   def capture(x, y)

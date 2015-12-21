@@ -12,6 +12,7 @@ class Game < ActiveRecord::Base
   validate :white_user_id_exists, if: :white_user_id?, on: :update
   validate :black_user_id_exists, if: :black_user_id?, on: :update
   validate :users_must_be_different, on: :update
+  validate :user_turn_must_be_valid, on: :update
   after_create :populate_board!
 
   # This is part of STI ~AMP:
@@ -39,6 +40,27 @@ class Game < ActiveRecord::Base
   def set_pieces_white_user_id
     pieces.where(color: true).each do |curr_piece|
       curr_piece.update_attributes(user_id: white_user_id)
+    end
+  end
+
+  def set_turn_id (player_id)
+    self.user_turn = player_id
+    self.save!
+  end
+
+  def finish_turn(player)
+    if player == black_user
+      set_turn_id(white_user_id)
+    else
+      set_turn_id(black_user_id)
+    end
+  end
+
+  def current_player
+    if self.user_turn == black_user_id
+      return self.black_user
+    else
+      return self.white_user
     end
   end
 
@@ -153,5 +175,10 @@ class Game < ActiveRecord::Base
   def users_must_be_different
     return unless black_user_id == white_user_id
     errors.add(:base, 'White and Black users cannot be the same!')
+  end
+
+  def user_turn_must_be_valid
+    return unless (user_turn != white_user_id) && (user_turn != black_user_id)
+    errors.add(:user_turn, 'Current turn is neither white or black user!')
   end
 end

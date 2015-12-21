@@ -88,10 +88,10 @@ RSpec.describe Piece, type: :model do
         board = create(:game)
         board.pieces.delete_all
         white_king = King.create(x_position: 1, y_position: 1,
-                                 game_id: board.id, color: true)
+                                 game_id: board.id, color: true, user_id: board.white_user_id)
 
-        expect { white_king.move_to!(3, 3) }
-          .to raise_error(/Invalid/)
+        expect(white_king.move_to!(3, 3)).to eq false
+        expect(white_king.flash_message).to match(/Invalid move/)
       end
     end
     context "when the pieces are of the same color" do
@@ -103,8 +103,8 @@ RSpec.describe Piece, type: :model do
         white_knight = Knight.create(x_position: 2, y_position: 2,
                                      game_id: board.id, color: true)
 
-        expect { white_king.move_to!(2, 2) }
-          .to raise_error(/Invalid/)
+        expect(white_king.move_to!(2, 2)).to eq false
+        expect(white_king.flash_message).to match(/Invalid move/)
       end
     end
   end
@@ -169,9 +169,9 @@ RSpec.describe Piece, type: :model do
       )
     end
 
-    it 'will raise an Error Message with invalid input' do
-      @white_queen.is_obstructed?(4, 3)
-      expect(@white_queen.flash_message).to be_present
+    it 'will flash an Error Message with invalid input' do
+      expect(@white_queen.is_obstructed?(4, 3)).to eq true
+      expect(@white_queen.flash_message).to match("Invalid input or invalid move.")
     end
 
     it 'will be false when horizontal axis path is clear' do

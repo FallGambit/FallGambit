@@ -1,17 +1,28 @@
 class PiecesController < ApplicationController
   before_action :authenticate_user!
+  before_action :must_be_users_turn, :must_be_users_piece
   after_action :flash_notice, only: :update
 
   def show
+    if @piece.game.player_missing?
+      flash[:alert] = "Cannot move until both players have joined!"
+      redirect_to game_path(@piece.game)
+    end
     @piece = Piece.find(params[:id])
     @current_game = current_game
   end
 
   def update
+    if @piece.game.player_missing?
+      flash[:alert] = "Cannot move until both players have joined!"
+      redirect_to game_path(@piece.game) and return
+    end
     @piece = Piece.find(params[:id])
     new_x = params[:x].to_i
     new_y = params[:y].to_i
-    @piece.move_to!(new_x, new_y)
+    if @piece.move_to!(new_x, new_y)
+      @piece.game.finish_turn(@piece.user)
+    end
     redirect_to game_path(@piece.game)
   end
 
@@ -24,6 +35,12 @@ class PiecesController < ApplicationController
   end
 
   helper_method :current_game, :show_piece_td
+
+  def flash_notice
+    if @piece.flash_message.present?
+      flash[:alert] = @piece.flash_message
+    end
+  end
 
   def current_game
     @piece = Piece.find(params[:id])
@@ -64,4 +81,19 @@ class PiecesController < ApplicationController
   def piece_type(piece)
     piece.present? ? piece.piece_type : nil
   end
+
+  def must_be_users_turn
+    if current_user.id != current_game.user_turn
+      flash[:alert] = "Not your turn!"
+      redirect_to game_path(current_game)
+    end
+  end
+
+  def must_be_users_piece
+    if @piece.user.nil? || current_user.id != @piece.user.id
+      flash[:alert] = "Not your piece!"
+      redirect_to game_path(current_game)
+    end
+  end
+
 end

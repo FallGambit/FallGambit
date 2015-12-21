@@ -1,17 +1,25 @@
 <h3>Games players can join:</h3>
 <% @games.each do |game|  %>
   <div class="list-group">
-    <div class="list-group-item">
-      <% if game.player_missing? %>
-        <h4>
-          <%= game.game_name %>
-        </h4>
+    <% if game.player_missing? %>
+      <div class="list-group-item">
+        <h4><%= game.game_name %></h4>
         <%= link_to 'Join Game', game_path(game, id: game.id), method: :patch, :class => 'btn btn-success btn-large join-game-link' %>
-      <% end  %>
-      <br />
-      <br />
-    </div>
+      </div>
+    <% end  %>
+    <br />
   </div>
 <% end %>
 
-<h3>Future list of games players can watch??</h3>
+<h3 class="text-center">Games players can watch:</h3>
+<% @games.each do |game|  %>
+  <div class="list-group">
+    <% if !game.player_missing? %>
+      <div class="list-group-item">
+        <h4><%= game.game_name %></h4>
+        <%= link_to 'Watch Game', game_path(game, id: game.id), :class => 'btn btn-success btn-large join-game-link' %>
+      </div>
+    <% end %>
+    <br />
+  </div>
+<% end %>
