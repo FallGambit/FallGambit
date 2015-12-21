@@ -1,6 +1,7 @@
 require 'rails_helper'
 RSpec.describe GamesController, type: :controller do
   describe "GET new" do
+    # TO-DO: replicate tests for both logged in and not-logged in user
     it "creates new game" do
       get :new
       expect(assigns(:game)).to be_a_new(Game)
@@ -12,6 +13,8 @@ RSpec.describe GamesController, type: :controller do
   end
 
   describe "GET show" do
+    # TO-DO: replicate tests for both logged in and not-logged in user
+    render_views
     let(:game) { create(:game) }
     context 'with valid params' do
       it "assigns the requested game to @game" do
