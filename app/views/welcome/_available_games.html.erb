@@ -11,13 +11,21 @@
   </div>
 <% end %>
 
-<h3 class="text-center">Games players can watch:</h3>
+<h3 class="text-center">Games in Progress:</h3>
 <% @games.each do |game|  %>
   <div class="list-group">
     <% if !game.player_missing? %>
       <div class="list-group-item">
         <h4><%= game.game_name %></h4>
+        <% if current_user && (current_user.id == game.white_user_id || current_user.id == game.black_user_id) %>
+          <% if game.user_turn == current_user.id %>
+            <%= link_to 'Your Turn!', game_path(game, id: game.id), :class => 'btn btn-warning btn-large join-game-link' %>
+          <% else %>
+            <%= link_to "Your Opponent's Turn", game_path(game, id: game.id), :class => 'btn btn-primary btn-large join-game-link' %>
+          <% end %>
+        <% else %>
         <%= link_to 'Watch Game', game_path(game, id: game.id), :class => 'btn btn-success btn-large join-game-link' %>
+        <% end %>
       </div>
     <% end %>
     <br />
