@@ -39,6 +39,12 @@ gem 'devise'
 # Implement foreign keys
 gem 'foreigner'
 
+# Use thin as the app server
+gem 'thin'
+
+# Use private_pub to update the chessboard in realtime
+gem 'private_pub'
+
 group :doc do
   # bundle exec rake doc:rails generates the API under doc/api.
   gem 'sdoc', require: false

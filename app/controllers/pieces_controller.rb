@@ -24,6 +24,12 @@ class PiecesController < ApplicationController
       @piece.game.finish_turn(@piece.user)
     end
     redirect_to game_path(@piece.game)
+    begin
+      PrivatePub.publish_to("/games/#{@piece.game.id}", "window.location.reload();")
+    rescue Errno::ECONNREFUSED
+      # flash.now[:alert] = "Pushing to Faye Failed"
+      return
+    end
   end
 
   private
