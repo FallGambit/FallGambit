@@ -1,14 +1,22 @@
 require 'rails_helper'
 RSpec.describe GamesController, type: :controller do
   describe "GET new" do
-    # TO-DO: replicate tests for both logged in and not-logged in user
-    it "creates new game" do
-      get :new
-      expect(assigns(:game)).to be_a_new(Game)
+    context "with logged in user" do
+      login_user
+      it "creates new game" do
+        get :new
+        expect(assigns(:game)).to be_a_new(Game)
+      end
+      it "renders the new template" do
+        get :new
+        expect(response).to render_template("new")
+      end
     end
-    it "renders the new template" do
-      get :new
-      expect(response).to render_template("new")
+    context "without being logged in" do
+      it "redirects to sign in page" do
+        get :new
+        expect(response).to redirect_to(new_user_session_path)
+      end
     end
   end
 
