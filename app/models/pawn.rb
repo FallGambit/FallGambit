@@ -8,7 +8,7 @@ class Pawn < Piece
     return false if dest_piece && dest_piece.color == color
     (one_forward(dest_x, dest_y) && dest_piece.nil?) ||
     (two_forward(dest_x, dest_y) && dest_piece.nil?) ||
-    one_diagonal(dest_x, dest_y)
+    (one_diagonal(dest_x, dest_y) && !dest_piece.nil?)
   end
 
   def white_moving

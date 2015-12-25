@@ -297,4 +297,271 @@ RSpec.describe Game, type: :model do
       expect(game.check?).to eq(true)
     end
   end
+
+  describe "range_between_pieces" do
+    before :each do
+      @game = FactoryGirl.create(:game)
+      @game.pieces.delete_all
+    end
+    context "horizontal range" do
+      it "returns empty for adjacent squares" do
+        black_king = King.create(color: false, game_id: @game.id, user_id: @game.black_user_id, x_position: 3, y_position: 4)
+        white_queen = Queen.create(color: true, game_id: @game.id, user_id: @game.white_user_id, x_position: 4, y_position: 4)
+        expect(@game.range_between_pieces(black_king, white_queen).empty?).to be true
+        expect(@game.range_between_pieces(white_queen, black_king).empty?).to be true
+      end
+      it "returns 1 for squares 2 away" do
+        black_king = King.create(color: false, game_id: @game.id, user_id: @game.black_user_id, x_position: 2, y_position: 4)
+        white_queen = Queen.create(color: true, game_id: @game.id, user_id: @game.white_user_id, x_position: 4, y_position: 4)
+        expect(@game.range_between_pieces(black_king, white_queen)).to contain_exactly([3, 4])
+        expect(@game.range_between_pieces(white_queen, black_king)).to contain_exactly([3, 4])
+      end
+      it "returns 2 for squares 3 away" do
+        black_king = King.create(color: false, game_id: @game.id, user_id: @game.black_user_id, x_position: 1, y_position: 4)
+        white_queen = Queen.create(color: true, game_id: @game.id, user_id: @game.white_user_id, x_position: 4, y_position: 4)
+        expect(@game.range_between_pieces(black_king, white_queen)).to contain_exactly([2, 4],[3, 4])
+        expect(@game.range_between_pieces(white_queen, black_king)).to contain_exactly([2, 4],[3, 4])
+      end
+    end
+    context "vertical range" do
+      it "returns empty for adjacent squares" do
+        black_king = King.create(color: false, game_id: @game.id, user_id: @game.black_user_id, x_position: 4, y_position: 3)
+        white_queen = Queen.create(color: true, game_id: @game.id, user_id: @game.white_user_id, x_position: 4, y_position: 4)
+        expect(@game.range_between_pieces(black_king, white_queen).empty?).to be true
+        expect(@game.range_between_pieces(white_queen, black_king).empty?).to be true
+      end
+      it "returns 1 for squares 2 away" do
+        black_king = King.create(color: false, game_id: @game.id, user_id: @game.black_user_id, x_position: 4, y_position: 2)
+        white_queen = Queen.create(color: true, game_id: @game.id, user_id: @game.white_user_id, x_position: 4, y_position: 4)
+        expect(@game.range_between_pieces(black_king, white_queen)).to contain_exactly([4, 3])
+        expect(@game.range_between_pieces(white_queen, black_king)).to contain_exactly([4, 3])
+      end
+      it "returns 2 for squares 3 away" do
+        black_king = King.create(color: false, game_id: @game.id, user_id: @game.black_user_id, x_position: 4, y_position: 1)
+        white_queen = Queen.create(color: true, game_id: @game.id, user_id: @game.white_user_id, x_position: 4, y_position: 4)
+        expect(@game.range_between_pieces(black_king, white_queen)).to contain_exactly([4, 2],[4, 3])
+        expect(@game.range_between_pieces(white_queen, black_king)).to contain_exactly([4, 2],[4, 3])
+      end
+    end
+    context "diagonal range" do
+      it "returns empty for adjacent squares NE-SW" do
+        black_king = King.create(color: false, game_id: @game.id, user_id: @game.black_user_id, x_position: 3, y_position: 3)
+        white_queen = Queen.create(color: true, game_id: @game.id, user_id: @game.white_user_id, x_position: 4, y_position: 4)
+        expect(@game.range_between_pieces(black_king, white_queen).empty?).to be true
+        expect(@game.range_between_pieces(white_queen, black_king).empty?).to be true
+      end
+      it "returns empty for adjacent squares NW-SE" do
+        black_king = King.create(color: false, game_id: @game.id, user_id: @game.black_user_id, x_position: 3, y_position: 3)
+        white_queen = Queen.create(color: true, game_id: @game.id, user_id: @game.white_user_id, x_position: 2, y_position: 4)
+        expect(@game.range_between_pieces(black_king, white_queen).empty?).to be true
+        expect(@game.range_between_pieces(white_queen, black_king).empty?).to be true
+      end
+      it "returns 1 for squares 2 away NE-SW" do
+        black_king = King.create(color: false, game_id: @game.id, user_id: @game.black_user_id, x_position: 3, y_position: 3)
+        white_queen = Queen.create(color: true, game_id: @game.id, user_id: @game.white_user_id, x_position: 5, y_position: 5)
+        expect(@game.range_between_pieces(black_king, white_queen)).to contain_exactly([4, 4])
+        expect(@game.range_between_pieces(white_queen, black_king)).to contain_exactly([4, 4])
+      end
+      it "returns 1 for squares 2 away NW-SE" do
+        black_king = King.create(color: false, game_id: @game.id, user_id: @game.black_user_id, x_position: 3, y_position: 3)
+        white_queen = Queen.create(color: true, game_id: @game.id, user_id: @game.white_user_id, x_position: 1, y_position: 5)
+        expect(@game.range_between_pieces(black_king, white_queen)).to contain_exactly([2, 4])
+        expect(@game.range_between_pieces(white_queen, black_king)).to contain_exactly([2, 4])
+      end
+      it "returns 2 for squares 3 away NE-SW" do
+        black_king = King.create(color: false, game_id: @game.id, user_id: @game.black_user_id, x_position: 3, y_position: 3)
+        white_queen = Queen.create(color: true, game_id: @game.id, user_id: @game.white_user_id, x_position: 6, y_position: 6)
+        expect(@game.range_between_pieces(black_king, white_queen)).to contain_exactly([4, 4],[5, 5])
+        expect(@game.range_between_pieces(white_queen, black_king)).to contain_exactly([4, 4],[5, 5])
+      end
+      it "returns 2 for squares 3 away NW-SE" do
+        black_king = King.create(color: false, game_id: @game.id, user_id: @game.black_user_id, x_position: 3, y_position: 3)
+        white_queen = Queen.create(color: true, game_id: @game.id, user_id: @game.white_user_id, x_position: 0, y_position: 6)
+        expect(@game.range_between_pieces(black_king, white_queen)).to contain_exactly([2, 4],[1, 5])
+        expect(@game.range_between_pieces(white_queen, black_king)).to contain_exactly([2, 4],[1, 5])
+      end
+    end
+    context "same square passed" do
+      it "returns empty if same square" do
+        black_king = King.create(color: false, game_id: @game.id, user_id: @game.black_user_id, x_position: 3, y_position: 3)
+        expect(@game.range_between_pieces(black_king, black_king).empty?).to be true
+      end
+    end
+    context "invalid range (not vertical, horizontal, or diagonal" do
+      it "returns nil if invalid range" do
+        black_king = King.create(color: false, game_id: @game.id, user_id: @game.black_user_id, x_position: 0, y_position: 0)
+        white_queen = Queen.create(color: true, game_id: @game.id, user_id: @game.white_user_id, x_position: 6, y_position: 7)
+        expect(@game.range_between_pieces(black_king, white_queen)).to be nil
+        expect(@game.range_between_pieces(white_queen, black_king)).to be nil
+      end
+    end
+  end
+
+  describe "checkmate?" do
+    before :each do
+      @game = FactoryGirl.create(:game)
+      @game.pieces.delete_all
+    end
+    context "is in checkmate" do
+      it "if in check and no valid moves to get out - example 1" do
+        black_king = King.create(color: false, game_id: @game.id, user_id: @game.black_user_id, x_position: 4, y_position: 7)
+        white_rook1 = Rook.create(color: true, game_id: @game.id, user_id: @game.white_user_id, x_position: 1, y_position: 6)
+        white_rook2 = Rook.create(color: true, game_id: @game.id, user_id: @game.white_user_id, x_position: 1, y_position: 7)
+        expect(@game.checkmate?(black_king)).to eq true
+      end
+      it "if in check and no valid moves to get out - example 2" do
+        black_king = King.create(color: false, game_id: @game.id, user_id: @game.black_user_id, x_position: 3, y_position: 3)
+        black_queen = Queen.create(color: false, game_id: @game.id, user_id: @game.black_user_id, x_position: 7, y_position: 4)
+        white_rook1 = Rook.create(color: true, game_id: @game.id, user_id: @game.white_user_id, x_position: 2, y_position: 2)
+        white_rook2 = Rook.create(color: true, game_id: @game.id, user_id: @game.white_user_id, x_position: 3, y_position: 5)
+        white_queen = Queen.create(color: true, game_id: @game.id, user_id: @game.white_user_id, x_position: 5, y_position: 5)
+        white_knight = Knight.create(color: true, game_id: @game.id, user_id: @game.white_user_id, x_position: 6, y_position: 2)
+        expect(@game.checkmate?(black_king)).to eq true
+      end
+      it "if in check and no valid moves to get out - example 3" do
+        black_king = King.create(color: false, game_id: @game.id, user_id: @game.black_user_id, x_position: 1, y_position: 0)
+        black_pawn = Pawn.create(color: false, game_id: @game.id, user_id: @game.black_user_id, x_position: 0, y_position: 1)
+        black_rook = Rook.create(color: false, game_id: @game.id, user_id: @game.black_user_id, x_position: 0, y_position: 0)
+        black_bishop = Bishop.create(color: false, game_id: @game.id, user_id: @game.black_user_id, x_position: 2, y_position: 0)
+        white_knight = Knight.create(color: true, game_id: @game.id, user_id: @game.white_user_id, x_position: 2, y_position: 2)
+        white_queen = Queen.create(color: true, game_id: @game.id, user_id: @game.white_user_id, x_position: 4, y_position: 1)
+        expect(@game.checkmate?(black_king)).to eq true
+      end
+      it "if in check and no valid moves to get out - example 4" do
+        black_king = King.create(color: false, game_id: @game.id, user_id: @game.black_user_id, x_position: 1, y_position: 0)
+        black_pawn = Pawn.create(color: false, game_id: @game.id, user_id: @game.black_user_id, x_position: 0, y_position: 1)
+        black_rook = Rook.create(color: false, game_id: @game.id, user_id: @game.black_user_id, x_position: 0, y_position: 0)
+        black_queen = Queen.create(color: false, game_id: @game.id, user_id: @game.black_user_id, x_position: 2, y_position: 0)
+        white_knight = Knight.create(color: true, game_id: @game.id, user_id: @game.white_user_id, x_position: 2, y_position: 2)
+        white_queen = Queen.create(color: true, game_id: @game.id, user_id: @game.white_user_id, x_position: 4, y_position: 1)
+        white_rook = Rook.create(color: true, game_id: @game.id, user_id: @game.white_user_id, x_position: 4, y_position: 0)
+        expect(@game.checkmate?(black_king)).to eq true
+      end
+      it "if in check and no valid moves to get out - example 5" do
+        white_king = King.create(color: true, game_id: @game.id, user_id: @game.black_user_id, x_position: 0, y_position: 0)
+        black_queen = Queen.create(color: false, game_id: @game.id, user_id: @game.white_user_id, x_position: 1, y_position: 1)
+        black_pawn = Pawn.create(color: false, game_id: @game.id, user_id: @game.white_user_id, x_position: 2, y_position: 2)
+        expect(@game.checkmate?(white_king)).to eq true # pawns must be on correct side of board!
+      end
+      it "if in check and no valid moves to get out - example 6" do
+        black_king = King.create(color: false, game_id: @game.id, user_id: @game.black_user_id, x_position: 0, y_position: 0)
+        white_queen = Queen.create(color: true, game_id: @game.id, user_id: @game.white_user_id, x_position: 2, y_position: 3)
+        white_bishop1 = Bishop.create(color: true, game_id: @game.id, user_id: @game.white_user_id, x_position: 2, y_position: 2)
+        white_bishop2 = Bishop.create(color: true, game_id: @game.id, user_id: @game.white_user_id, x_position: 2, y_position: 1)
+        expect(@game.checkmate?(black_king)).to eq true
+      end
+      it "if in check and no valid moves to get out - example 7" do
+        black_king = King.create(color: false, game_id: @game.id, user_id: @game.black_user_id, x_position: 2, y_position: 0)
+        black_rook = Rook.create(color: false, game_id: @game.id, user_id: @game.black_user_id, x_position: 5, y_position: 3)
+        white_rook1 = Rook.create(color: true, game_id: @game.id, user_id: @game.white_user_id, x_position: 0, y_position: 1)
+        white_rook2 = Rook.create(color: true, game_id: @game.id, user_id: @game.white_user_id, x_position: 5, y_position: 0)
+        white_bishop = Bishop.create(color: true, game_id: @game.id, user_id: @game.white_user_id, x_position: 4, y_position: 2)
+        expect(@game.checkmate?(black_king)).to eq true
+      end
+    end
+    context "is not in checkmate" do
+      it "if in check and can move king out" do
+        black_king = King.create(color: false, game_id: @game.id, user_id: @game.black_user_id, x_position: 4, y_position: 7)
+        white_rook = Rook.create(color: true, game_id: @game.id, user_id: @game.white_user_id, x_position: 1, y_position: 7)
+        expect(@game.checkmate?(black_king)).to eq false
+      end
+      it "if in check and can move a friendly piece to block - example 1" do
+        # black queen can block black king from being in check from white rooks
+        black_king = King.create(color: false, game_id: @game.id, user_id: @game.black_user_id, x_position: 4, y_position: 7)
+        white_rook1 = Rook.create(color: true, game_id: @game.id, user_id: @game.white_user_id, x_position: 1, y_position: 6)
+        white_rook2 = Rook.create(color: true, game_id: @game.id, user_id: @game.white_user_id, x_position: 1, y_position: 7)
+        black_queen = Queen.create(color: false, game_id: @game.id, user_id: @game.black_user_id, x_position: 3, y_position: 3)
+        expect(@game.checkmate?(black_king)).to eq false
+      end
+      it "if in check and can move a friendly piece to block - example 2" do
+        # black bishop can capture white queen and block white bishop from putting king in check
+        black_king = King.create(color: false, game_id: @game.id, user_id: @game.black_user_id, x_position: 0, y_position: 0)
+        black_bishop = Bishop.create(color: false, game_id: @game.id, user_id: @game.black_user_id, x_position: 2, y_position: 0)
+        white_queen = Queen.create(color: true, game_id: @game.id, user_id: @game.white_user_id, x_position: 1, y_position: 1)
+        white_bishop = Bishop.create(color: true, game_id: @game.id, user_id: @game.white_user_id, x_position: 2, y_position: 2)
+        expect(@game.checkmate?(black_king)).to eq false
+        expect(white_queen.captured?).to eq false # make sure piece isn't actually captured by the test
+      end
+      it "if in check and can move a friendly piece to block - example 3" do
+        # black rook can move down to black king and block white rook's check
+        black_king = King.create(color: false, game_id: @game.id, user_id: @game.black_user_id, x_position: 2, y_position: 0)
+        black_rook = Rook.create(color: false, game_id: @game.id, user_id: @game.black_user_id, x_position: 3, y_position: 3)
+        white_rook1 = Rook.create(color: true, game_id: @game.id, user_id: @game.white_user_id, x_position: 5, y_position: 0)
+        white_rook2 = Rook.create(color: true, game_id: @game.id, user_id: @game.white_user_id, x_position: 0, y_position: 1)
+        expect(@game.checkmate?(black_king)).to eq false
+      end
+      it "if in check and king can capture threatening piece - example 1" do
+        black_king = King.create(color: false, game_id: @game.id, user_id: @game.black_user_id, x_position: 4, y_position: 7)
+        white_rook1 = Rook.create(color: true, game_id: @game.id, user_id: @game.white_user_id, x_position: 1, y_position: 6)
+        white_rook2 = Rook.create(color: true, game_id: @game.id, user_id: @game.white_user_id, x_position: 3, y_position: 7)
+        expect(@game.checkmate?(black_king)).to eq false
+        expect(white_rook2.captured?).to eq false # make sure piece isn't actually captured by the test
+      end
+      it "if in check and king can capture threatening piece - example 2" do
+        # king can capture queen
+        black_king = King.create(color: false, game_id: @game.id, user_id: @game.black_user_id, x_position: 0, y_position: 0)
+        white_queen = Queen.create(color: true, game_id: @game.id, user_id: @game.white_user_id, x_position: 1, y_position: 1)
+        expect(@game.checkmate?(black_king)).to eq false
+        expect(white_queen.captured?).to eq false # make sure piece isn't actually captured by the test
+      end
+      it "if in check and king can capture threatening piece - example 3" do
+        # black king can capture white queen putting it in check and move out of white knight check
+        black_king = King.create(color: false, game_id: @game.id, user_id: @game.black_user_id, x_position: 0, y_position: 0)
+        black_pawn = Pawn.create(color: false, game_id: @game.id, user_id: @game.black_user_id, x_position: 0, y_position: 1)
+        black_knight = Knight.create(color: false, game_id: @game.id, user_id: @game.black_user_id, x_position: 1, y_position: 0)
+        white_queen = Queen.create(color: true, game_id: @game.id, user_id: @game.white_user_id, x_position: 1, y_position: 1)
+        white_knight = Knight.create(color: true, game_id: @game.id, user_id: @game.white_user_id, x_position: 1, y_position: 2)
+        expect(@game.checkmate?(black_king)).to eq false
+        expect(white_queen.captured?).to eq false # make sure piece isn't actually captured by the test
+      end
+      it "if not in check" do
+        # can't be checkmate if not in check
+        black_king = King.create(color: false, game_id: @game.id, user_id: @game.black_user_id, x_position: 4, y_position: 7)
+        white_rook = Rook.create(color: true, game_id: @game.id, user_id: @game.white_user_id, x_position: 1, y_position: 6)
+        expect(@game.checkmate?(black_king)).to eq false
+      end
+      it "if in check and friendly piece can capture threatening piece - example 1" do
+        # black pawn can capture white knight
+        white_king = King.create(color: true, game_id: @game.id, user_id: @game.black_user_id, x_position: 1, y_position: 0)
+        white_pawn1 = Pawn.create(color: true, game_id: @game.id, user_id: @game.black_user_id, x_position: 0, y_position: 1)
+        white_pawn2 = Pawn.create(color: true, game_id: @game.id, user_id: @game.black_user_id, x_position: 1, y_position: 1)
+        white_pawn3 = Pawn.create(color: true, game_id: @game.id, user_id: @game.black_user_id, x_position: 2, y_position: 1)
+        white_rook = Rook.create(color: true, game_id: @game.id, user_id: @game.black_user_id, x_position: 0, y_position: 0)
+        white_bishop = Bishop.create(color: true, game_id: @game.id, user_id: @game.black_user_id, x_position: 2, y_position: 0)
+        black_knight = Knight.create(color: false, game_id: @game.id, user_id: @game.white_user_id, x_position: 2, y_position: 2)
+        expect(@game.checkmate?(white_king)).to eq false # pawns have to be on the correct side!
+        expect(black_knight.captured?).to eq false # make sure piece isn't actually captured by the test
+      end
+      it "if in check and friendly piece can capture threatening piece - example 2" do
+        # black queen can capture white knight
+        white_king = King.create(color: true, game_id: @game.id, user_id: @game.black_user_id, x_position: 1, y_position: 0)
+        white_pawn = Pawn.create(color: true, game_id: @game.id, user_id: @game.black_user_id, x_position: 0, y_position: 1)
+        white_rook = Rook.create(color: true, game_id: @game.id, user_id: @game.black_user_id, x_position: 0, y_position: 0)
+        white_queen = Queen.create(color: true, game_id: @game.id, user_id: @game.black_user_id, x_position: 2, y_position: 0)
+        black_knight = Knight.create(color: false, game_id: @game.id, user_id: @game.white_user_id, x_position: 2, y_position: 2)
+        black_queen = Queen.create(color: false, game_id: @game.id, user_id: @game.white_user_id, x_position: 4, y_position: 1)
+        expect(@game.checkmate?(white_king)).to eq false # pawns have to be on the correct side!
+        expect(black_knight.captured?).to eq false # make sure piece isn't actually captured by the test
+      end
+      it "if in check and friendly piece can capture threatening piece - example 3" do
+        # black rook can capture white rook which has black king in check
+        black_king = King.create(color: false, game_id: @game.id, user_id: @game.black_user_id, x_position: 2, y_position: 0)
+        black_rook = Rook.create(color: false, game_id: @game.id, user_id: @game.black_user_id, x_position: 5, y_position: 3)
+        white_rook1 = Rook.create(color: true, game_id: @game.id, user_id: @game.white_user_id, x_position: 0, y_position: 1)
+        white_rook2 = Rook.create(color: true, game_id: @game.id, user_id: @game.white_user_id, x_position: 5, y_position: 0)
+        expect(@game.checkmate?(black_king)).to eq false
+        expect(white_rook2.captured?).to eq false # make sure piece isn't actually captured by the test
+      end
+      it "if in check and friendly piece can capture threatening piece - example 4" do
+        # black knight can capture white bishop which has black king in check
+        black_king = King.create(color: false, game_id: @game.id, user_id: @game.black_user_id, x_position: 0, y_position: 0)
+        black_knight = Knight.create(color: false, game_id: @game.id, user_id: @game.black_user_id, x_position: 3, y_position: 0)
+        white_bishop1 = Bishop.create(color: true, game_id: @game.id, user_id: @game.white_user_id, x_position: 2, y_position: 1)
+        white_bishop2 = Bishop.create(color: true, game_id: @game.id, user_id: @game.white_user_id, x_position: 2, y_position: 2)
+        white_queen = Queen.create(color: true, game_id: @game.id, user_id: @game.white_user_id, x_position: 2, y_position: 3)
+        expect(@game.checkmate?(black_king)).to eq false
+        expect(white_bishop2.captured?).to eq false # make sure piece isn't actually captured by the test
+      end
+    end
+  end
 end

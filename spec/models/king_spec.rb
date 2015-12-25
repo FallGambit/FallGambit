@@ -83,18 +83,22 @@ RSpec.describe King, type: :model do
         expect(@black_king.can_castle?(@black_kingside_rook)).to be true
         expect(@white_king.can_castle?(@white_kingside_rook)).to be true
       end
-      it "moves queenside castle" do
+      it "moves black queenside castle" do
         @black_king.castle!(@black_queenside_rook)
         expect(@black_king.x_y_coords).to eq [2, 7]
         expect(@black_queenside_rook.x_y_coords).to eq [3, 7]
+      end
+      it "moves white queenside castle" do
         @white_king.castle!(@white_queenside_rook)
         expect(@white_king.x_y_coords).to eq [2, 0]
         expect(@white_queenside_rook.x_y_coords).to eq [3, 0]
       end
-      it "moves kingside castle" do
+      it "moves black kingside castle" do
         @black_king.castle!(@black_kingside_rook)
         expect(@black_king.x_y_coords).to eq [6, 7]
         expect(@black_kingside_rook.x_y_coords).to eq [5, 7]
+      end
+      it "moves white kingside castle" do
         @white_king.castle!(@white_kingside_rook)
         expect(@white_king.x_y_coords).to eq [6, 0]
         expect(@white_kingside_rook.x_y_coords).to eq [5, 0]
@@ -145,18 +149,23 @@ RSpec.describe King, type: :model do
         expect(@white_king.can_castle?(white_queenside_rook2)).to be false
       end
       context "start, moves through, or ends in check" do
-        # check is not currently implemented - will need to fill these in
         it "does not allow castle if the king currently is in check" do
           # set up situation where king is in check to start
-          expect(false).to be false
+          @black_kingside_rook.update_attributes(x_position: 4, y_position: 5)
+          expect(@white_king.can_castle?(@white_kingside_rook)).to be false
+          expect(@white_king.flash_message).to eq "Can't castle while in check!"
         end
         it "does not allow castle if the king moves through check" do
           # set up situation where the king moves through check while castling
-          expect(false).to be false
+          @black_kingside_rook.update_attributes(x_position: 5, y_position: 5)
+          expect(@white_king.can_castle?(@white_kingside_rook)).to be false
+          expect(@white_king.flash_message).to eq "Cannot move King into check while castling!"
         end
         it "does not allow castle if the king ends in check" do
           # set up situation where king ends in check after a castle
-          expect(false).to be false
+          @black_kingside_rook.update_attributes(x_position: 6, y_position: 5)
+          expect(@white_king.can_castle?(@white_kingside_rook)).to be false
+          expect(@white_king.flash_message).to eq "Cannot move King into check while castling!"
         end
       end
       it "does not move the pieces" do

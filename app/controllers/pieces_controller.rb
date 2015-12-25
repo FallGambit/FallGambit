@@ -34,12 +34,6 @@ class PiecesController < ApplicationController
 
   private
 
-  def flash_notice
-    if @piece.flash_message.present?
-      flash[:alert] = @piece.flash_message
-    end
-  end
-
   helper_method :current_game, :show_piece_td
 
   def flash_notice
