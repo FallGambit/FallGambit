@@ -438,9 +438,9 @@ RSpec.describe Game, type: :model do
         expect(@game.checkmate?(black_king)).to eq true
       end
       it "if in check and no valid moves to get out - example 5" do
-        white_king = King.create(color: true, game_id: @game.id, user_id: @game.black_user_id, x_position: 0, y_position: 0)
-        black_queen = Queen.create(color: false, game_id: @game.id, user_id: @game.white_user_id, x_position: 1, y_position: 1)
-        black_pawn = Pawn.create(color: false, game_id: @game.id, user_id: @game.white_user_id, x_position: 2, y_position: 2)
+        white_king = King.create(color: true, game_id: @game.id, user_id: @game.white_user_id, x_position: 0, y_position: 0)
+        black_queen = Queen.create(color: false, game_id: @game.id, user_id: @game.black_user_id, x_position: 1, y_position: 1)
+        black_pawn = Pawn.create(color: false, game_id: @game.id, user_id: @game.black_user_id, x_position: 2, y_position: 2)
         expect(@game.checkmate?(white_king)).to eq true # pawns must be on correct side of board!
       end
       it "if in check and no valid moves to get out - example 6" do
@@ -522,24 +522,24 @@ RSpec.describe Game, type: :model do
       end
       it "if in check and friendly piece can capture threatening piece - example 1" do
         # black pawn can capture white knight
-        white_king = King.create(color: true, game_id: @game.id, user_id: @game.black_user_id, x_position: 1, y_position: 0)
-        white_pawn1 = Pawn.create(color: true, game_id: @game.id, user_id: @game.black_user_id, x_position: 0, y_position: 1)
-        white_pawn2 = Pawn.create(color: true, game_id: @game.id, user_id: @game.black_user_id, x_position: 1, y_position: 1)
-        white_pawn3 = Pawn.create(color: true, game_id: @game.id, user_id: @game.black_user_id, x_position: 2, y_position: 1)
-        white_rook = Rook.create(color: true, game_id: @game.id, user_id: @game.black_user_id, x_position: 0, y_position: 0)
-        white_bishop = Bishop.create(color: true, game_id: @game.id, user_id: @game.black_user_id, x_position: 2, y_position: 0)
-        black_knight = Knight.create(color: false, game_id: @game.id, user_id: @game.white_user_id, x_position: 2, y_position: 2)
+        white_king = King.create(color: true, game_id: @game.id, user_id: @game.white_user_id, x_position: 1, y_position: 0)
+        white_pawn1 = Pawn.create(color: true, game_id: @game.id, user_id: @game.white_user_id, x_position: 0, y_position: 1)
+        white_pawn2 = Pawn.create(color: true, game_id: @game.id, user_id: @game.white_user_id, x_position: 1, y_position: 1)
+        white_pawn3 = Pawn.create(color: true, game_id: @game.id, user_id: @game.white_user_id, x_position: 2, y_position: 1)
+        white_rook = Rook.create(color: true, game_id: @game.id, user_id: @game.white_user_id, x_position: 0, y_position: 0)
+        white_bishop = Bishop.create(color: true, game_id: @game.id, user_id: @game.white_user_id, x_position: 2, y_position: 0)
+        black_knight = Knight.create(color: false, game_id: @game.id, user_id: @game.black_user_id, x_position: 2, y_position: 2)
         expect(@game.checkmate?(white_king)).to eq false # pawns have to be on the correct side!
         expect(black_knight.captured?).to eq false # make sure piece isn't actually captured by the test
       end
       it "if in check and friendly piece can capture threatening piece - example 2" do
         # black queen can capture white knight
-        white_king = King.create(color: true, game_id: @game.id, user_id: @game.black_user_id, x_position: 1, y_position: 0)
-        white_pawn = Pawn.create(color: true, game_id: @game.id, user_id: @game.black_user_id, x_position: 0, y_position: 1)
-        white_rook = Rook.create(color: true, game_id: @game.id, user_id: @game.black_user_id, x_position: 0, y_position: 0)
-        white_queen = Queen.create(color: true, game_id: @game.id, user_id: @game.black_user_id, x_position: 2, y_position: 0)
-        black_knight = Knight.create(color: false, game_id: @game.id, user_id: @game.white_user_id, x_position: 2, y_position: 2)
-        black_queen = Queen.create(color: false, game_id: @game.id, user_id: @game.white_user_id, x_position: 4, y_position: 1)
+        white_king = King.create(color: true, game_id: @game.id, user_id: @game.white_user_id, x_position: 1, y_position: 0)
+        white_pawn = Pawn.create(color: true, game_id: @game.id, user_id: @game.white_user_id, x_position: 0, y_position: 1)
+        white_rook = Rook.create(color: true, game_id: @game.id, user_id: @game.white_user_id, x_position: 0, y_position: 0)
+        white_queen = Queen.create(color: true, game_id: @game.id, user_id: @game.white_user_id, x_position: 2, y_position: 0)
+        black_knight = Knight.create(color: false, game_id: @game.id, user_id: @game.black_user_id, x_position: 2, y_position: 2)
+        black_queen = Queen.create(color: false, game_id: @game.id, user_id: @game.black_user_id, x_position: 4, y_position: 1)
         expect(@game.checkmate?(white_king)).to eq false # pawns have to be on the correct side!
         expect(black_knight.captured?).to eq false # make sure piece isn't actually captured by the test
       end

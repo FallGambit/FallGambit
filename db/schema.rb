@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20151220012117) do
+ActiveRecord::Schema.define(version: 20151223044337) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -24,6 +24,7 @@ ActiveRecord::Schema.define(version: 20151220012117) do
     t.integer  "check_status"
     t.integer  "white_user_id"
     t.integer  "black_user_id"
+    t.integer  "game_winner"
   end
 
   add_index "games", ["black_user_id"], name: "index_games_on_black_user_id", using: :btree
@@ -62,6 +63,7 @@ ActiveRecord::Schema.define(version: 20151220012117) do
   add_index "users", ["reset_password_token"], name: "index_users_on_reset_password_token", unique: true, using: :btree
 
   add_foreign_key "games", "users", name: "games_black_user_id_fk", column: "black_user_id"
+  add_foreign_key "games", "users", name: "games_game_winner_fk", column: "game_winner"
   add_foreign_key "games", "users", name: "games_user_turn_fk", column: "user_turn"
   add_foreign_key "games", "users", name: "games_white_user_id_fk", column: "white_user_id"
 
